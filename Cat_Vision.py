@@ -1,11 +1,25 @@
-import cv2
+import cv2 as cv
 
-print(cv2.__version__)
+garagem_ext = 1
+fundos_esq = 2
+fundos_dir = 3
+tangara = 4
+garagem_int = 5
+servico = 6
 
-img = cv2.imread("discord pfp.jpg", 1)
-img = cv2.resize(img, (0,0), fx=2,fy=2)
-img = cv2.rotate(img, cv2.ROTATE_180)
+channel = tangara
+cam = f'rtsp://admin:%2C06YtO%2Fj@192.168.0.151:554/cam/realmonitor?channel={channel}&subtype=0'
 
-cv2.imshow("Image", img)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+cap = cv.VideoCapture(cam)
+
+while(True):
+    ret, frame = cap.read()
+
+    cv.imshow("Frame", frame)
+
+    key = cv.waitKey(30)
+    if key == 27:
+        break
+
+cap.release()
+cv.destroyAllWindows()
