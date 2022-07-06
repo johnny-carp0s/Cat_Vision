@@ -17,7 +17,7 @@ while(True):
 
     cv.imshow("Frame", frame)
 
-    key = cv.waitKey(30)
+    key = cv.waitKey(1)
     if key == 27:
         break
 
