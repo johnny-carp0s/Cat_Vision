@@ -1,4 +1,5 @@
 import cv2 as cv
+import Cat_Detection as cd
 
 garagem_ext = 1
 fundos_esq = 2
@@ -12,12 +13,15 @@ cam = f'rtsp://admin:%2C06YtO%2Fj@192.168.0.151:554/cam/realmonitor?channel={cha
 
 cap = cv.VideoCapture(cam)
 
-while(True):
+while(cap.isOpened()):
     ret, frame = cap.read()
 
-    cv.imshow("Frame", frame)
+    #detections
+    results = cd.cv_model(frame)
 
-    key = cv.waitKey(1)
+    cv.imshow("Frame", results)
+
+    key = cv.waitKey(10)
     if key == 27:
         break
 
