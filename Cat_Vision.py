@@ -25,7 +25,7 @@ class camThread(threading.Thread):
         camPreview(self.previewName, self.camID)
 
 def camPreview(previewName, camID):
-    cv.namedWindow(previewName)s
+    cv.namedWindow(previewName)
     cam = cv.VideoCapture(camID)
     if cam.isOpened():  # try to get the first frame
         rval, frame = cam.read()
@@ -40,13 +40,14 @@ def camPreview(previewName, camID):
             break
     cv.destroyWindow(previewName)
 
-#Captura dos videos das cameras TESTE
-cap_gararem_ext = cv.VideoCapture(captura_cam(garagem))
-cap_fundos_esq = cv.VideoCapture(cam)
-cap_ = cv.VideoCapture(cam)
-cap = cv.VideoCapture(cam)
-cap = cv.VideoCapture(cam)
-cap = cv.VideoCapture(cam)
+thread_g_ext = camThread("garagem_ext", captura_cam(garagem_ext))
+thread_f_esq = camThread("fundos_esq", captura_cam(fundos_esq))
+thread_f_dir = camThread("fundos_dir", captura_cam(fundos_dir))
+thread_tanga = camThread("tangara", captura_cam(tangara))
+thread_g_int = camThread("garagem_int", captura_cam(garagem_int))
+thread_servi = camThread("servico", captura_cam(servico))
+thread_g_ext.start()
+thread_f_esq.start()
 
 #altura e largura dos videos para salvar
 frame_width = int(cap.get(3))
