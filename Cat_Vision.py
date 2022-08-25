@@ -15,6 +15,31 @@ def captura_cam(cam):
         camera = f'rtsp://admin:%2C06YtO%2Fj@192.168.0.151:554/cam/realmonitor?channel={cam}&subtype=0'
         return camera
 
+class camThread(threading.Thread):
+    def __init__(self, previewName, camID):
+        threading.Thread.__init__(self)
+        self.previewName = previewName
+        self.camID = camID
+    def run(self):
+        print ("Starting " + self.previewName)
+        camPreview(self.previewName, self.camID)
+
+def camPreview(previewName, camID):
+    cv.namedWindow(previewName)s
+    cam = cv.VideoCapture(camID)
+    if cam.isOpened():  # try to get the first frame
+        rval, frame = cam.read()
+    else:
+        rval = False
+
+    while rval:
+        cv.imshow(previewName, frame)
+        rval, frame = cam.read()
+        key = cv.waitKey(20)
+        if key == 27:  # exit on ESC
+            break
+    cv.destroyWindow(previewName)
+
 #Captura dos videos das cameras TESTE
 cap_gararem_ext = cv.VideoCapture(captura_cam(garagem))
 cap_fundos_esq = cv.VideoCapture(cam)
