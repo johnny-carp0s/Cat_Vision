@@ -2,7 +2,7 @@ import cv2 as cv
 import Cat_Detection as cd
 import threading
 
-#Valor cameras
+#Valor cameras 
 garagem_ext = 1
 fundos_esq = 2
 fundos_dir = 3
@@ -22,19 +22,35 @@ class camThread(threading.Thread):
         self.camID = camID
     def run(self):
         print ("Starting " + self.previewName)
-        camPreview(self.previewName, self.camID)
+        camProcessing(self.previewName, self.camID)
 
-def camPreview(previewName, camID):
+def camProcessing(previewName, camID):
     cv.namedWindow(previewName)
     cam = cv.VideoCapture(camID)
     if cam.isOpened():  # try to get the first frame
         rval, frame = cam.read()
+
+        #altura e largura dos videos para salvar
+        frame_width = int(cam.get(3))
+        frame_height = int(cam.get(4))
+        size = (frame_width, frame_height)
     else:
+        print(f"Error reading {previewName} video file")
         rval = False
 
+    #PROCESSAMENTO DO VIDEO
     while rval:
         cv.imshow(previewName, frame)
         rval, frame = cam.read()
+
+        #Detecção de objetos no frame do video
+        results, cat = cd.cv_model(frame)
+
+        #Ações se encontrar gato
+        if cat:
+            cv.putText(img=results, org=(100,250), text="GATO ENCONTRADO!!!",
+            fontFace=cv.FONT_HERSHEY_TRIPLEX, fontScale=1, color=(0, 0, 255),thickness=3)
+
         key = cv.waitKey(20)
         if key == 27:  # exit on ESC
             break
@@ -46,55 +62,23 @@ thread_f_dir = camThread("fundos_dir", captura_cam(fundos_dir))
 thread_tanga = camThread("tangara", captura_cam(tangara))
 thread_g_int = camThread("garagem_int", captura_cam(garagem_int))
 thread_servi = camThread("servico", captura_cam(servico))
+
 thread_g_ext.start()
 thread_f_esq.start()
+thread_f_dir.start()
+thread_tanga.start()
+thread_g_int.start()
+thread_servi.start()
 
-#altura e largura dos videos para salvar
-frame_width = int(cap.get(3))
-frame_height = int(cap.get(4))
 
-print(frame_width)
-print(frame_height)
-
-size = (frame_width, frame_height)
 
 #Check para salvar o video e nomear arquivo
-file_name = ""
-save = input("Do you want to save this video? (y/n)")
-if(save == "y"):
-    file_name = input("What's the file name? ")
-    result = cv.VideoWriter(f"Saved Videos/{file_name}.avi", cv.VideoWriter_fourcc(*'MP4V'), 10, size)
+#file_name = ""
+#save = input("Do you want to save this video? (y/n)")
+#if(save == "y"):
+#    file_name = input("What's the file name? ")
+#    result = cv.VideoWriter(f"Saved Videos/{file_name}.avi", cv.VideoWriter_fourcc(*'MP4V'), 10, size)
 
-#Check se video esta funcionando
-if (cap.isOpened() == False):
-	print("Error reading video file")
-
-#PROCESSAMENTO DO VIDEO
-while(cap.isOpened()):
-
-    #leitura de frame
-    ret, frame = cap.read()
-
-    #Detecção de objetos no frame do video
-    results, cat = cd.cv_model(frame)
-
-    #Salva frame do video
-    if(save == "y"):
-        result.write(results)
-
-    #Ações se encontrar gato
-    if cat:
-        cv.putText(img=results, org=(100,250), text="GATO ENCONTRADO!!!",
-            fontFace=cv.FONT_HERSHEY_TRIPLEX, fontScale=1, color=(0, 0, 255),thickness=3)
-
-    #Display de video
-    cv.imshow("Frame", results)
-
-    #Controle do display do video
-    key = cv.waitKey(10)
-    if key == 27:
-        break
-
-#Finaliza captura e video
-cap.release()
-cv.destroyAllWindows()
+#Salva frame do video
+    #if(save == "y"):
+        #result.write(results)
