@@ -1,6 +1,7 @@
 import cv2 as cv
 import Cat_Detection as cd
 import threading
+from time import sleep
 
 #Valor cameras 
 garagem_ext = 1
@@ -16,69 +17,71 @@ def captura_cam(cam):
         return camera
 
 class camThread(threading.Thread):
-    def __init__(self, previewName, camID):
+    def __init__(self, previewName, camID, frame=0, cat=False, rval=True):
         threading.Thread.__init__(self)
         self.previewName = previewName
         self.camID = camID
+        self.cat = cat
+        self.frame = frame
+        self.rval = rval
     def run(self):
         print ("Starting " + self.previewName)
-        camProcessing(self.previewName, self.camID)
+        camProcessing(self)
 
-def camProcessing(previewName, camID):
-    cv.namedWindow(previewName)
-    cam = cv.VideoCapture(camID)
+def camProcessing(cm):
+
+    cv.namedWindow(cm.previewName)
+    cam = cv.VideoCapture(cm.camID)
     if cam.isOpened():  # try to get the first frame
-        rval, frame = cam.read()
-
-        #altura e largura dos videos para salvar
-        frame_width = int(cam.get(3))
-        frame_height = int(cam.get(4))
-        size = (frame_width, frame_height)
+        cm.rval, cm.frame = cam.read()
     else:
-        print(f"Error reading {previewName} video file")
-        rval = False
+        print(f"Error reading {cm.previewName} video file")
+        cm.rval = False
 
     #PROCESSAMENTO DO VIDEO
-    while rval:
-        cv.imshow(previewName, frame)
-        rval, frame = cam.read()
+    while cm.rval:
+        cv.imshow(cm.previewName, cm.frame)
+        cm.rval, cm.frame = cam.read()
 
         #Detecção de objetos no frame do video
-        results, cat = cd.cv_model(frame)
-
-        #Ações se encontrar gato
-        if cat:
-            cv.putText(img=results, org=(100,250), text="GATO ENCONTRADO!!!",
-            fontFace=cv.FONT_HERSHEY_TRIPLEX, fontScale=1, color=(0, 0, 255),thickness=3)
+        results, cm.cat = cd.cv_model(cm.frame)   
 
         key = cv.waitKey(20)
         if key == 27:  # exit on ESC
+            cm.rval = False
             break
-    cv.destroyWindow(previewName)
+    cv.destroyWindow(cm.previewName)
 
-thread_g_ext = camThread("garagem_ext", captura_cam(garagem_ext))
-thread_f_esq = camThread("fundos_esq", captura_cam(fundos_esq))
-thread_f_dir = camThread("fundos_dir", captura_cam(fundos_dir))
-thread_tanga = camThread("tangara", captura_cam(tangara))
-thread_g_int = camThread("garagem_int", captura_cam(garagem_int))
-thread_servi = camThread("servico", captura_cam(servico))
+
+def gato_encontrado():
+    #Valor gato encontrado
+    gato_i = 1
+
+    array_g = [thread_g_ext]
+
+    while thread_g_ext.rval == True:
+        for g in array_g:
+            if g.cat == True:
+                gato_loc = f'Gatos/gato{gato_i}.png'
+                cv.imwrite(gato_loc, g.frame)
+                cd.save_to_db(gato_loc, g.previewName, gato_i)
+                gato_i = gato_i + 1
+        
+        sleep(2)
+
+check_gatos = threading.Thread(target=gato_encontrado)
+
+thread_g_ext = camThread("garagem_ext", "object_tracking/Branco-Tangara.mp4") #captura_cam(garagem_ext)
+#thread_f_esq = camThread("fundos_esq", captura_cam(fundos_esq))
+#thread_f_dir = camThread("fundos_dir", captura_cam(fundos_dir))
+#thread_tanga = camThread("tangara", captura_cam(tangara))
+#thread_g_int = camThread("garagem_int", captura_cam(garagem_int))
+#thread_servi = camThread("servico", captura_cam(servico))
 
 thread_g_ext.start()
-thread_f_esq.start()
-thread_f_dir.start()
-thread_tanga.start()
-thread_g_int.start()
-thread_servi.start()
-
-
-
-#Check para salvar o video e nomear arquivo
-#file_name = ""
-#save = input("Do you want to save this video? (y/n)")
-#if(save == "y"):
-#    file_name = input("What's the file name? ")
-#    result = cv.VideoWriter(f"Saved Videos/{file_name}.avi", cv.VideoWriter_fourcc(*'MP4V'), 10, size)
-
-#Salva frame do video
-    #if(save == "y"):
-        #result.write(results)
+#thread_f_esq.start()
+#thread_f_dir.start()
+#thread_tanga.start()
+#thread_g_int.start()
+#thread_servi.start()
+check_gatos.start()
