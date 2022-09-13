@@ -2,6 +2,7 @@ import cv2 as cv
 import Cat_Detection as cd
 import threading
 from time import sleep
+import os
 
 #Valor cameras 
 garagem_ext = 1
@@ -30,7 +31,7 @@ class camThread(threading.Thread):
 
 def camProcessing(cm):
 
-    cv.namedWindow(cm.previewName)
+    #cv.namedWindow(cm.previewName)
     cam = cv.VideoCapture(cm.camID)
     if cam.isOpened():  # try to get the first frame
         cm.rval, cm.frame = cam.read()
@@ -40,7 +41,7 @@ def camProcessing(cm):
 
     #PROCESSAMENTO DO VIDEO
     while cm.rval:
-        cv.imshow(cm.previewName, cm.frame)
+        #cv.imshow(cm.previewName, cm.frame)
         cm.rval, cm.frame = cam.read()
 
         #Detecção de objetos no frame do video
@@ -55,33 +56,34 @@ def camProcessing(cm):
 
 def gato_encontrado():
     #Valor gato encontrado
-    gato_i = 1
+    gato_i = len(os.listdir("Gatos"))+1
 
-    array_g = [thread_g_ext]
+    array_g = [thread_g_ext, thread_f_esq]
 
     while thread_g_ext.rval == True:
         for g in array_g:
             if g.cat == True:
                 gato_loc = f'Gatos/gato{gato_i}.png'
                 cv.imwrite(gato_loc, g.frame)
-                cd.save_to_db(gato_loc, g.previewName, gato_i)
+                cd.save_to_db(gato_loc, g.previewName)
                 gato_i = gato_i + 1
         
         sleep(2)
 
 check_gatos = threading.Thread(target=gato_encontrado)
 
-thread_g_ext = camThread("garagem_ext", "object_tracking/Branco-Tangara.mp4") #captura_cam(garagem_ext)
-#thread_f_esq = camThread("fundos_esq", captura_cam(fundos_esq))
-#thread_f_dir = camThread("fundos_dir", captura_cam(fundos_dir))
-#thread_tanga = camThread("tangara", captura_cam(tangara))
-#thread_g_int = camThread("garagem_int", captura_cam(garagem_int))
-#thread_servi = camThread("servico", captura_cam(servico))
+#"object_tracking/Branco-Tangara.mp4"
+thread_g_ext = camThread("garagem_ext", captura_cam(garagem_ext)) 
+thread_f_esq = camThread("fundos_esq", captura_cam(fundos_esq)) 
+thread_f_dir = camThread("fundos_dir", captura_cam(fundos_dir))
+thread_tanga = camThread("tangara", captura_cam(tangara))
+thread_g_int = camThread("garagem_int", captura_cam(garagem_int))
+thread_servi = camThread("servico", captura_cam(servico))
 
 thread_g_ext.start()
-#thread_f_esq.start()
-#thread_f_dir.start()
-#thread_tanga.start()
-#thread_g_int.start()
-#thread_servi.start()
+thread_f_esq.start()
+thread_f_dir.start()
+thread_tanga.start()
+thread_g_int.start()
+thread_servi.start()
 check_gatos.start()

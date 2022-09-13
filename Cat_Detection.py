@@ -3,6 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 from datetime import datetime
+import os
 
 #Import do modelo IA
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
@@ -21,8 +22,8 @@ def cv_model(vid):
     
     return results, cat
 
-def save_to_db(img, camera, index):
-    df = pd.read_excel(db)
+def save_to_db(img, camera):
+    df = pd.read_excel(db, engine="openpyxl")
     writer = pd.ExcelWriter(db, engine="xlsxwriter")
 
     #pegar data
@@ -30,15 +31,28 @@ def save_to_db(img, camera, index):
     dt_string = agora.strftime("%d/%m/%Y %H:%M:%S")
 
     #dataframe que vai ser adicionado
-    df_new = pd.DataFrame({ "data":[dt_string], "camera":[camera]})
-
-    #adicionar imagem
-    worksheet = writer.sheets["Sheet1"]
-    worksheet.insert_image(f'C{index}', img, {'x_scale': 0.25, 'y_scale': 0.25})
+    df_new = pd.DataFrame({"Data":[dt_string], "Camera":[camera]})
 
     #juntar e salvar
     df = pd.concat([df, df_new], ignore_index=True)
-    df.to_excel(writer, index=False)
     print(df)
+    df.to_excel(writer, index=False)
+
+    #adicionar imagem
+    worksheet = writer.sheets["Sheet1"]
+    i = 2
+
+    #add previous images
+    for cat in os.listdir("Gatos"):
+        worksheet.insert_image(f'A{i}', f"Gatos/{cat}", {'x_scale': 0.1, 'y_scale': 0.1, 'object_position': 2})
+        worksheet.set_row(i-1, 85)
+        i = i+1
+    
+    rows_count = len(df.index)
+    worksheet.insert_image(f'A{rows_count+1}', img, {'x_scale': 0.1, 'y_scale': 0.1, 'object_position': 2})
+    worksheet.set_row(rows_count, 85)
+    worksheet.set_column(1, 1, 20)
+    worksheet.set_column(0, 0, 27)
+    print("image inserted")
 
     writer.save()
