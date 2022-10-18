@@ -9,7 +9,7 @@ import os
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
 
 #start database
-db = "Cat_Vision_db.xlsx"
+db = "C:/Users/joaod/OneDrive/Documentos/Cat_Vision_db.xlsx"
 
 #Processamento de imagem e detecção de objetos
 def cv_model(vid):
@@ -42,15 +42,12 @@ def save_to_db(img, camera):
     worksheet = writer.sheets["Sheet1"]
     i = 2
 
-    #add previous images
+    #add images
     for cat in os.listdir("Gatos"):
         worksheet.insert_image(f'A{i}', f"Gatos/{cat}", {'x_scale': 0.1, 'y_scale': 0.1, 'object_position': 2})
         worksheet.set_row(i-1, 85)
         i = i+1
     
-    rows_count = len(df.index)
-    worksheet.insert_image(f'A{rows_count+1}', img, {'x_scale': 0.1, 'y_scale': 0.1, 'object_position': 2})
-    worksheet.set_row(rows_count, 85)
     worksheet.set_column(1, 1, 20)
     worksheet.set_column(0, 0, 27)
     print("image inserted")

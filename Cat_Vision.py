@@ -73,7 +73,7 @@ def gato_encontrado():
 check_gatos = threading.Thread(target=gato_encontrado)
 
 #"object_tracking/Branco-Tangara.mp4"
-thread_g_ext = camThread("garagem_ext", captura_cam(garagem_ext)) 
+thread_g_ext = camThread("garagem_ext", captura_cam(garagem_ext)) #
 thread_f_esq = camThread("fundos_esq", captura_cam(fundos_esq)) 
 thread_f_dir = camThread("fundos_dir", captura_cam(fundos_dir))
 thread_tanga = camThread("tangara", captura_cam(tangara))
