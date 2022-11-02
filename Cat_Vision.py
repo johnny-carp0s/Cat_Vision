@@ -56,14 +56,14 @@ def camProcessing(cm):
 
 def gato_encontrado():
     #Valor gato encontrado
-    gato_i = len(os.listdir("Gatos"))+1
+    gato_i = len(os.listdir("Gatos2"))+1
 
-    array_g = [thread_g_ext, thread_f_esq]
+    array_g = [thread_g_ext, thread_f_esq, thread_f_dir, thread_tanga, thread_g_int, thread_servi]
 
     while thread_g_ext.rval == True:
         for g in array_g:
             if g.cat == True:
-                gato_loc = f'Gatos/gato{gato_i}.png'
+                gato_loc = f'Gatos2/gato{gato_i}.png'
                 cv.imwrite(gato_loc, g.frame)
                 cd.save_to_db(gato_loc, g.previewName)
                 gato_i = gato_i + 1

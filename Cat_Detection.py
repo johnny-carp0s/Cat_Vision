@@ -3,13 +3,12 @@ from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 from datetime import datetime
-import os
 
 #Import do modelo IA
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
 
 #start database
-db = "C:/Users/joaod/OneDrive/Documentos/Cat_Vision_db.xlsx"
+db = "C:/Users/joaod/OneDrive/Documentos/Cat_Vision_db(1).xlsx"
 
 #Processamento de imagem e detecção de objetos
 def cv_model(vid):
@@ -40,13 +39,11 @@ def save_to_db(img, camera):
 
     #adicionar imagem
     worksheet = writer.sheets["Sheet1"]
-    i = 2
 
     #add images
-    for cat in os.listdir("Gatos"):
-        worksheet.insert_image(f'A{i}', f"Gatos/{cat}", {'x_scale': 0.1, 'y_scale': 0.1, 'object_position': 2})
-        worksheet.set_row(i-1, 85)
-        i = i+1
+    for row in range(2,len(df)):
+        worksheet.insert_image(f'A{row}', f"Gatos2/gato{row}.png", {'x_scale': 0.1, 'y_scale': 0.1, 'object_position': 2})
+        worksheet.set_row(row, 85)
     
     worksheet.set_column(1, 1, 20)
     worksheet.set_column(0, 0, 27)
