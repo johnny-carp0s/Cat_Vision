@@ -8,7 +8,7 @@ from datetime import datetime
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
 
 #start database
-db = "C:/Users/joaod/OneDrive/Documentos/Cat_Vision_db(1).xlsx"
+db = "C:/Users/joaod/OneDrive/Documentos/Cat_Vision_db (1).xlsx"
 
 #Processamento de imagem e detecção de objetos
 def cv_model(vid):
