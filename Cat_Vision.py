@@ -65,7 +65,7 @@ def gato_encontrado():
             if g.cat == True:
                 gato_loc = f'Gatos2/gato{gato_i}.png'
                 cv.imwrite(gato_loc, g.frame)
-                cd.save_to_db(gato_loc, g.previewName)
+                cd.save_to_db(g.previewName)
                 gato_i = gato_i + 1
         
         sleep(2)
@@ -78,7 +78,7 @@ thread_f_esq = camThread("fundos_esq", captura_cam(fundos_esq))
 thread_f_dir = camThread("fundos_dir", captura_cam(fundos_dir))
 thread_tanga = camThread("tangara", captura_cam(tangara))
 thread_g_int = camThread("garagem_int", captura_cam(garagem_int))
-thread_servi = camThread("servico", captura_cam(servico))
+thread_servi = camThread("serviço", captura_cam(servico))
 
 thread_g_ext.start()
 thread_f_esq.start()
